@@ -65,6 +65,7 @@ cc_library_shared {
         "-fvisibility=hidden",
         "-Wno-unused-parameter",
         "-Wno-unused-variable",
+        "-DSKQP_BUILD_HARDWAREBUFFER_TEST",
     ],
 
     cppflags:[
@@ -1463,6 +1464,7 @@ cc_library_shared {
         "tests/UtilsTest.cpp",
         "tests/VerticesTest.cpp",
         "tests/VkClearTests.cpp",
+        "tests/VkHardwareBufferTest.cpp",
         "tests/VkHeapTests.cpp",
         "tests/VkMakeCopyPipelineTest.cpp",
         "tests/VkUploadPixelsTests.cpp",
