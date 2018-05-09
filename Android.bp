@@ -5,7 +5,6 @@ cc_library_shared {
     sdk_version: "26",
     stl: "libc++_static",
     compile_multilib: "both",
-    tags: ["tests", "optional"],
 
     cflags: [
         "-U_FORTIFY_SOURCE",
