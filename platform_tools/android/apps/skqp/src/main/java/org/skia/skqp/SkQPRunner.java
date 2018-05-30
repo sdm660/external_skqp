@@ -64,12 +64,12 @@ public class SkQPRunner extends Runner implements Filterable {
         for (int backend = 0; backend < impl.mBackends.length; backend++) {
             for (int gm = 0; gm < impl.mGMs.length; gm++) {
                 mTests[index++] = Description.createTestDescription(SkQPRunner.class,
-                    impl.mBackends[backend] + "/" + impl.mGMs[gm]);
+                    impl.mBackends[backend] + "_" + impl.mGMs[gm]);
             }
         }
         for (int unitTest = 0; unitTest < impl.mUnitTests.length; unitTest++) {
             mTests[index++] = Description.createTestDescription(SkQPRunner.class,
-                    "unitTest/" + impl.mUnitTests[unitTest]);
+                    "unitTest_" + impl.mUnitTests[unitTest]);
         }
         assert(index == mTests.length);
         mShouldRunTestCount = mTests.length;
@@ -130,7 +130,7 @@ public class SkQPRunner extends Runner implements Filterable {
                     Log.w(TAG, String.format("[ERROR] '%s': %s", name, error));
                 } else if (value != 0) {
                     SkQPRunner.Fail(desc, notifier, String.format(
-                                "Image mismatch: max channel diff = %f", value));
+                                "Image mismatch: error metric = %f", value));
                     Log.w(TAG, String.format("[FAIL] '%s': %f > 0", name, value));
                 } else {
                     Log.i(TAG, String.format("Rendering Test '%s' passed", name));

@@ -15,9 +15,12 @@ class GNAndroidFlavorUtils(default_flavor.DefaultFlavorUtils):
     super(GNAndroidFlavorUtils, self).__init__(m)
     self._ever_ran_adb = False
     self.ADB_BINARY = '/usr/bin/adb.1.0.35'
+    self.ADB_PUB_KEY = '/home/chrome-bot/.android/adbkey'
     self._golo_devices = ['Nexus5x']
     if self.m.vars.builder_cfg.get('model') in self._golo_devices:
       self.ADB_BINARY = '/opt/infra-android/tools/adb'
+      self.ADB_PUB_KEY = ('/home/chrome-bot/.android/'
+                          'chrome_infrastructure_adbkey')
 
     self.device_dirs = default_flavor.DeviceDirs(
         dm_dir        = self.m.vars.android_data_dir + 'dm_out',
@@ -102,10 +105,11 @@ class GNAndroidFlavorUtils(default_flavor.DefaultFlavorUtils):
                  fail_build_on_failure=False)
 
     with self.m.context(cwd=self.m.vars.skia_dir):
-      return self.m.run.with_retry(self.m.step, title, attempts,
-                                   cmd=[self.ADB_BINARY]+list(cmd),
-                                   between_attempts_fn=wait_for_device,
-                                   **kwargs)
+      with self.m.env({'ADB_VENDOR_KEYS': self.ADB_PUB_KEY}):
+        return self.m.run.with_retry(self.m.step, title, attempts,
+                                     cmd=[self.ADB_BINARY]+list(cmd),
+                                     between_attempts_fn=wait_for_device,
+                                     **kwargs)
 
   def _scale_for_dm(self):
     device = self.m.vars.builder_cfg.get('model')
@@ -458,22 +462,38 @@ if 'already disabled' not in output:
   subprocess.check_output([ADB, 'reboot'])
   wait_for_device()
 
-# ASAN setup script is idempotent, either it installs it or says it's installed
-output = subprocess.check_output([ADB, 'wait-for-device'])
-process = subprocess.Popen([ASAN_SETUP], env={'ADB': ADB},
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def installASAN(revert=False):
+  # ASAN setup script is idempotent, either it installs it or
+  # says it's installed.  Returns True on success, false otherwise.
+  out = subprocess.check_output([ADB, 'wait-for-device'])
+  print out
+  cmd = [ASAN_SETUP]
+  if revert:
+    cmd = [ASAN_SETUP, '--revert']
+  process = subprocess.Popen(cmd, env={'ADB': ADB},
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-# this also blocks until command finishes
-(stdout, stderr) = process.communicate()
-print stdout
-print 'Stderr: %s' % stderr
-if process.returncode:
-  raise Exception('setup ASAN returned with non-zero exit code: %d' %
-                  process.returncode)
+  # this also blocks until command finishes
+  (stdout, stderr) = process.communicate()
+  print stdout
+  print 'Stderr: %s' % stderr
+  return process.returncode == 0
 
-if 'Please wait until the device restarts' in stdout:
+if not installASAN():
+  print 'Trying to revert the ASAN install and then re-install'
+  # ASAN script sometimes has issues if it was interrupted or partially applied
+  # Try reverting it, then re-enabling it
+  if not installASAN(revert=True):
+    raise Exception('reverting ASAN install failed')
+
   # Sleep because device does not reboot instantly
-  time.sleep(30)
+  time.sleep(10)
+
+  if not installASAN():
+    raise Exception('Tried twice to setup ASAN and failed.')
+
+# Sleep because device does not reboot instantly
+time.sleep(10)
 wait_for_device()
 """,
         args = [self.ADB_BINARY, asan_setup],
