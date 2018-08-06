@@ -28,6 +28,9 @@ LOCAL_JAVA_LIBRARIES := android.test.runner.stubs
 
 LOCAL_JNI_SHARED_LIBRARIES := libskqp_app
 
+# include both the 32 and 64 bit versions
+LOCAL_MULTILIB := both
+
 LOCAL_USE_AAPT2 := true
 
 LOCAL_STATIC_ANDROID_LIBRARIES := \
