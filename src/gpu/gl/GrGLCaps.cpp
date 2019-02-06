@@ -2052,7 +2052,7 @@ bool GrGLCaps::initDescForDstCopy(const GrRenderTargetProxy* src, GrSurfaceDesc*
 
     // If the src is a texture, we can implement the blit as a draw assuming the config is
     // renderable.
-    if (src->asTextureProxy() && this->isConfigRenderable(src->config(), false)) {
+    if (src->asTextureProxy() && !this->isConfigRenderable(src->config())) {
         desc->fOrigin = kBottomLeft_GrSurfaceOrigin;
         desc->fFlags = kRenderTarget_GrSurfaceFlag;
         desc->fConfig = src->config();
@@ -2476,10 +2476,10 @@ void GrGLCaps::onApplyOptionsOverrides(const GrContextOptions& options) {
     }
 }
 
-int GrGLCaps::getSampleCount(int requestedCount, GrPixelConfig config) const {
+int GrGLCaps::getRenderTargetSampleCount(int requestedCount, GrPixelConfig config) const {
     requestedCount = SkTMax(1, requestedCount);
     int count = fConfigTable[config].fColorSampleCounts.count();
-    if (!count || !this->isConfigRenderable(config, requestedCount > 1)) {
+    if (!count) {
         return 0;
     }
 
@@ -2493,6 +2493,14 @@ int GrGLCaps::getSampleCount(int requestedCount, GrPixelConfig config) const {
         }
     }
     return 0;
+}
+
+int GrGLCaps::maxRenderTargetSampleCount(GrPixelConfig config) const {
+    const auto& table = fConfigTable[config].fColorSampleCounts;
+    if (!table.count()) {
+        return 0;
+    }
+    return table[table.count() - 1];
 }
 
 bool validate_sized_format(GrGLenum format, SkColorType ct, GrPixelConfig* config,
