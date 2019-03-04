@@ -37,7 +37,7 @@ LOCAL_STATIC_ANDROID_LIBRARIES := \
     android-support-design
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
-    ctstestrunner
+    ctstestrunner-axt
 
 LOCAL_SRC_FILES := $(call all-java-files-under, java)
 
