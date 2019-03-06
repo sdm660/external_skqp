@@ -1534,6 +1534,7 @@ cc_library_shared {
         "tests/VkDrawableTest.cpp",
         "tests/VkHardwareBufferTest.cpp",
         "tests/VkMakeCopyPipelineTest.cpp",
+        "tests/VkPriorityExtensionTest.cpp",
         "tests/VkWrapTests.cpp",
         "tests/VptrTest.cpp",
         "tests/WindowRectanglesTest.cpp",
