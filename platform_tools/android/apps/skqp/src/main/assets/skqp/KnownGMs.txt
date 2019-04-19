@@ -547,7 +547,6 @@ shadermaskfilter_image
 shadertext
 shadertext2
 shadertext3
-shadow_utils
 shadow_utils_gray
 shadow_utils_occl
 shadows
@@ -571,7 +570,6 @@ simpleaaclip_aaclip
 simpleaaclip_path
 simpleaaclip_rect
 simpleblurroundrect
-simplerect
 simpleshapes
 simpleshapes_bw
 skbug1719
@@ -611,7 +609,6 @@ textblob
 textblobblockreordering
 textblobcolortrans
 textblobgeometrychange
-textbloblooper
 textblobmixedsizes
 textblobmixedsizes_df
 textblobrandomfont
