@@ -180,6 +180,7 @@ sweep_tiling
 tablecolorfilter
 tall_stretched_bitmaps
 testgradient
+textbloblooper
 textblobmixedsizes
 textblobmixedsizes_df
 thinconcavepaths
